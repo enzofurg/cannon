@@ -8,24 +8,44 @@ class Target:
         self.x= random.randint(10,480)
         self.y= random.randint(60,500)
     def spawn(self):
-        pyxel.circb(self.x, self.y, 1, 8)
-        pyxel.circb(self.x, self.y, 2, 7)
-        pyxel.circb(self.x, self.y, 3, 8)
-        pyxel.circb(self.x, self.y, 4, 7)
-        pyxel.circb(self.x, self.y, 5, 8)
+        pyxel.circ(self.x, self.y, 4, 8)
+        pyxel.circ(self.x, self.y, 3, 7)
+        pyxel.circ(self.x, self.y, 2, 8)
+        pyxel.circ(self.x, self.y, 1, 7)
+        pyxel.circ(self.x, self.y, 0, 8)
+    def hitcheck(self, hitcords, radius):
+        #if (pyxel.pget(self.cords[0], self.cords[1])) == 7 or (pyxel.pget(self.cords[0], self.cords[1])) == 8:
+            #print("Acerto")
+        self.hitdistance = math.sqrt((self.x-hitcords[0])**2 + (self.y-hitcords[1])**2)
+        if self.hitdistance <= radius:
+            print("Acerto")
+            return True
+        else:
+            return False
+
 #
 class Shoot:
-    def __init__(self, charge, elevation, angle, centrotuple):
+    def __init__(self, charge, elevation, angle, centrotuple, time):
+        self.centrocords = centrotuple
+        self.angle = angle
         self.distance= (25*charge)**2 * math.sin(2*elevation) / 9.8
-        #print(self.distance)
+        self.traveltime= time + 2 * (25*charge*math.sin(elevation)) / 9.8
+        print(self.traveltime)
+        self.speed = self.distance / self.traveltime
         self.cords=(centrotuple[0]+self.distance*math.cos(angle), centrotuple[1]-self.distance*math.sin(angle))
+        self.cordstx = centrotuple[0]
+        self.cordsty = centrotuple[1]
+        self.timelapse = 0
         #print(self.cords)
-    def hitcheck(self):
-        if (pyxel.pget(self.cords[0], self.cords[1])) == 7 or (pyxel.pget(self.cords[0], self.cords[1])) == 8:
-            print("Acerto")
-        pass
-    def animate(self):
-        pyxel.circ(self.cords[0],self.cords[1], 5, 10)
+
+    def animate(self, time):
+        self.timelapse+=1/12
+        self.cordstx = self.centrocords[0] + self.speed*self.timelapse*math.cos(self.angle)
+        self.cordsty = self.centrocords[1] - self.speed*self.timelapse*math.cos(self.angle) 
+        print(self.cordstx, self.cordsty)
+        pyxel.circ(self.cordstx,self.cordsty, 20, 10)
+        if time > self.traveltime:
+            pyxel.circ(self.cords[0],self.cords[1], 5, 10)
 
 class Aim:
     def __init__(self, charge, elevation, angle, centrotuple):
@@ -40,6 +60,7 @@ class Aim:
 
 class Juego:
     def __init__(self):
+        self.tempo = 0
         self.screenwidth = 500
         self.screenlength = 600
         pyxel.init(self.screenwidth,self.screenlength, title="Cannon",fps=12)
@@ -52,9 +73,11 @@ class Juego:
         self.elevationrad = 0
         self.charge=1
         self.fire=False
-        self.alvo1=Target()
-        self.alvo2=Target()
-        self.alvo3=Target()
+        self.tiros = []
+        self.alvos = []
+
+        for i in range(5):
+            self.alvos.append(Target())
         pyxel.run(self.update, self.draw)
 
 
@@ -62,12 +85,20 @@ class Juego:
     def update(self):
         self.fire=False
         self.elevationrad = self.elevation * math.pi/180
-        if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT):
-            self.tiro=Shoot(self.charge,self.elevationrad,self.anglerad,self.centro)
-            self.tiro.hitcheck()
+        if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) and len(self.tiros)<1:
+            self.tiros.append(Shoot(self.charge,self.elevationrad,self.anglerad,self.centro, self.tempo))
+            for alvos in self.alvos:
+                if alvos.hitcheck(self.tiros[0].cords, 10):
+                    self.alvos.remove(alvos)
+                    #self.tiros=[]
             self.fire=True
         else:
             self.mira=Aim(self.charge,self.elevationrad,self.anglerad,self.centro)
+            
+        for tiro in self.tiros:
+            if tiro.traveltime + 1 < self.tempo:
+                self.tiros=[]
+        
         if pyxel.btn(pyxel.KEY_UP):
             if (self.elevation + 0.5) > 45:
                 self.elevation = 45
@@ -99,22 +130,33 @@ class Juego:
         #print(self.vetor)
         #self, charge, elevation, angle, centrox, centroy
         #print(pyxel.mouse_wheel)
+        self.tempo+=1/12
+        #print(f"Tempo: {self.tempo}")
         pass
     
     def draw(self):
         pyxel.cls(0)
         pyxel.dither(0.1)
         pyxel.rect(0,0,self.screenwidth, self.screenlength, 1)
+        pyxel.dither(0.5)
+        pyxel.line(0,self.screenlength-50,self.screenwidth, self.screenlength-50, 8)
+        pyxel.line(0,self.screenlength-51,self.screenwidth, self.screenlength-51, 8)
+        pyxel.line(0,self.screenlength-52,self.screenwidth, self.screenlength-52, 8)
+
         pyxel.dither(1)
-        self.alvo1.spawn()
-        self.alvo2.spawn()
-        self.alvo3.spawn()
+        for alvos in self.alvos:
+            alvos.spawn()
+        #self.alvo1.spawn()
+        #self.alvo2.spawn()
+        #self.alvo3.spawn()
         #print(self.centro)
         if self.fire:
             pyxel.circ(self.cannontip[0],self.cannontip[1],2,10)
-            self.tiro.animate()
+            
         else:
             self.mira.animate()
+        for tiro in self.tiros:
+            tiro.animate(self.tempo)
         #else:
             #pyxel.circb()
         #pyxel.circb(self.centro[0],self.centro[1], 20, 7)
@@ -122,16 +164,17 @@ class Juego:
         pyxel.circ(self.centro[0], self.centro[1], 3, 7)
         
         #pyxel.line(self.centro[0], self.centro[1], pyxel.mouse_x, pyxel.mouse_y,7)
-        #Cano:
+        #DESENHO DO CANO
         pyxel.line(self.centro[0], self.centro[1], self.cannontip[0], self.cannontip[1], 7)
         pyxel.line(self.centro[0]-1,self.centro[1],self.cannontip[0], self.cannontip[1], 7)
         pyxel.line(self.centro[0]+1,self.centro[1],self.cannontip[0], self.cannontip[1], 7)
         
-
+        #TEXTO
         pyxel.text(10,10,f"Mouse (x,y): {pyxel.mouse_x}, {pyxel.mouse_y}", 7)
         pyxel.text(10,20, f"Angle {self.angle:.2f}°", 7)
         pyxel.text(10,30, f"Elevation: {self.elevation:.1f}",7)
         pyxel.text(10,40, f"Charge: {self.charge}",7)
+        pyxel.text(10,50, f"Time: {int(self.tempo)}s",7)
         pass
     
 Juego()
