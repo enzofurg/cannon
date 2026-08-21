@@ -1,7 +1,7 @@
 import pyxel
 import math
 import random
-
+#ARGH!!!
 
 class Target:
     def __init__(self):
@@ -26,24 +26,33 @@ class Target:
 #
 class Shoot:
     def __init__(self, charge, elevation, angle, centrotuple, time):
+        self.abstime=time
         self.centrocords = centrotuple
         self.angle = angle
         self.distance= (25*charge)**2 * math.sin(2*elevation) / 9.8
         self.traveltime= time + 2 * (25*charge*math.sin(elevation)) / 9.8
         print(self.traveltime)
-        self.speed = self.distance / self.traveltime
+        self.speed = self.distance / (self.traveltime-time)
+        print(self.speed)
         self.cords=(centrotuple[0]+self.distance*math.cos(angle), centrotuple[1]-self.distance*math.sin(angle))
         self.cordstx = centrotuple[0]
         self.cordsty = centrotuple[1]
-        self.timelapse = 0
+        #self.cordstx = self.centrocords[0] + self.distance * math.cos(self.angle) * (time - self.abstime)/12
+        #self.cordsty = self.centrocords[1] - self.distance * math.sin(self.angle) * (time - self.abstime)/12
+        
         #print(self.cords)
+    def move(self, time):
+        self.cordstx += self.speed * math.cos(self.angle)/12
+        self.cordsty -= self.speed * math.sin(self.angle)/12
+        if self.cordstx>self.cords[0] or self.cordsty<self.cords[1]:
+            self.cordstx = self.cords[0]
+            self.cordsty = self.cords[1]
 
     def animate(self, time):
-        self.timelapse+=1/12
-        self.cordstx = self.centrocords[0] + self.speed*self.timelapse*math.cos(self.angle)
-        self.cordsty = self.centrocords[1] - self.speed*self.timelapse*math.cos(self.angle) 
-        print(self.cordstx, self.cordsty)
-        pyxel.circ(self.cordstx,self.cordsty, 20, 10)
+        
+
+        #print(self.cordstx, self.cordsty)
+        pyxel.circ(self.cordstx,self.cordsty, 2, 10)
         if time > self.traveltime:
             pyxel.circ(self.cords[0],self.cords[1], 5, 10)
 
@@ -120,7 +129,8 @@ class Juego:
                 self.charge=1
             else:
                 self.charge-=1
-        
+        for tiro in self.tiros:
+            tiro.move(self.tempo)
         
         #pyxel.mouse(True)
         #self.vetor=((pyxel.mouse_x - 60),(pyxel.mouse_y -60))
@@ -155,6 +165,7 @@ class Juego:
             
         else:
             self.mira.animate()
+            
         for tiro in self.tiros:
             tiro.animate(self.tempo)
         #else:
