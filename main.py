@@ -6,7 +6,7 @@ import random
 class Target:
     def __init__(self):
         self.x= random.randint(10,480)
-        self.y= random.randint(60,500)
+        self.y= random.randint(60,400)
     def spawn(self):
         pyxel.circ(self.x, self.y, 4, 8)
         pyxel.circ(self.x, self.y, 3, 7)
@@ -23,6 +23,27 @@ class Target:
         else:
             return False
 
+class Soldier:
+    def __init__(self):
+        self.x = random.randint(10,480)
+        self.y = random.randint(40,70)
+    def hitcheck(self, hitcords, radius):
+        self.hitdistance = math.sqrt((self.x-hitcords[0])**2 + (self.y-hitcords[1])**2)
+        if self.hitdistance <= radius:
+            print("Acerto")
+            return True
+        else:
+            return False
+    def bordercheck(self, screenlength):
+        if self.y>= screenlength -50:
+            return True
+        else:
+            return False
+    def draw(self):
+        pyxel.rect(self.x,self.y,2,2,6)
+    def move(self):
+        self.y+=1/12
+
 #
 class Shoot:
     def __init__(self, charge, elevation, angle, centrotuple, time):
@@ -30,13 +51,17 @@ class Shoot:
         self.centrocords = centrotuple
         self.angle = angle
         self.distance= (25*charge)**2 * math.sin(2*elevation) / 9.8
+        self.height = 0
+        self.hspeed = (25*charge)*math.sin(elevation)
         self.traveltime= time + 2 * (25*charge*math.sin(elevation)) / 9.8
         print(self.traveltime)
+        
         self.speed = self.distance / (self.traveltime-time)
         print(self.speed)
         self.cords=(centrotuple[0]+self.distance*math.cos(angle), centrotuple[1]-self.distance*math.sin(angle))
         self.cordstx = centrotuple[0]
         self.cordsty = centrotuple[1]
+        
         #self.cordstx = self.centrocords[0] + self.distance * math.cos(self.angle) * (time - self.abstime)/12
         #self.cordsty = self.centrocords[1] - self.distance * math.sin(self.angle) * (time - self.abstime)/12
         
@@ -44,7 +69,11 @@ class Shoot:
     def move(self, time):
         self.cordstx += self.speed * math.cos(self.angle)/12
         self.cordsty -= self.speed * math.sin(self.angle)/12
-        if self.cordstx>self.cords[0] or self.cordsty<self.cords[1]:
+        self.hspeed = self.hspeed - 9.8/12
+        self.height += self.hspeed/12
+        print(self.hspeed)
+        #if self.cordstx>self.cords[0] or self.cordsty<self.cords[1]:
+        if time > self.traveltime:
             self.cordstx = self.cords[0]
             self.cordsty = self.cords[1]
 
@@ -52,9 +81,12 @@ class Shoot:
         
 
         #print(self.cordstx, self.cordsty)
-        pyxel.circ(self.cordstx,self.cordsty, 2, 10)
+
+        pyxel.circ(self.cordstx,self.cordsty, 2+abs(self.height/30), 10)
         if time > self.traveltime:
-            pyxel.circ(self.cords[0],self.cords[1], 5, 10)
+            pyxel.circ(self.cords[0],self.cords[1], 8, 8)
+            pyxel.circ(self.cords[0],self.cords[1], 7, 10)
+            pyxel.circ(self.cords[0],self.cords[1], 5, 7)
 
 class Aim:
     def __init__(self, charge, elevation, angle, centrotuple):
@@ -84,10 +116,16 @@ class Juego:
         self.fire=False
         self.tiros = []
         self.alvos = []
+        self.soldados = []
 
-        for i in range(5):
+        for i in range(25):
             self.alvos.append(Target())
+
+        for i in range(0):
+            self.soldados.append(Soldier())
         pyxel.run(self.update, self.draw)
+
+
 
 
         
@@ -96,17 +134,23 @@ class Juego:
         self.elevationrad = self.elevation * math.pi/180
         if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) and len(self.tiros)<1:
             self.tiros.append(Shoot(self.charge,self.elevationrad,self.anglerad,self.centro, self.tempo))
-            for alvos in self.alvos:
-                if alvos.hitcheck(self.tiros[0].cords, 10):
-                    self.alvos.remove(alvos)
-                    #self.tiros=[]
+
             self.fire=True
         else:
             self.mira=Aim(self.charge,self.elevationrad,self.anglerad,self.centro)
+
+        for soldado in self.soldados:
+            soldado.move()
             
         for tiro in self.tiros:
-            if tiro.traveltime + 1 < self.tempo:
-                self.tiros=[]
+            if tiro.traveltime < self.tempo:
+                for alvo in self.alvos:
+                    if alvo.hitcheck(tiro.cords,10):
+                        self.alvos.remove(alvo)
+                for soldado in self.soldados:
+                    if soldado.hitcheck(tiro.cords,10):
+                        self.soldados.remove(soldado)
+                self.tiros.remove(tiro)
         
         if pyxel.btn(pyxel.KEY_UP):
             if (self.elevation + 0.5) > 45:
@@ -156,10 +200,10 @@ class Juego:
         pyxel.dither(1)
         for alvos in self.alvos:
             alvos.spawn()
-        #self.alvo1.spawn()
-        #self.alvo2.spawn()
-        #self.alvo3.spawn()
-        #print(self.centro)
+
+        for soldado in self.soldados:
+            soldado.draw()
+
         if self.fire:
             pyxel.circ(self.cannontip[0],self.cannontip[1],2,10)
             
@@ -168,9 +212,8 @@ class Juego:
             
         for tiro in self.tiros:
             tiro.animate(self.tempo)
-        #else:
-            #pyxel.circb()
-        #pyxel.circb(self.centro[0],self.centro[1], 20, 7)
+
+
         pyxel.rect(0,self.centro[1],self.screenwidth,self.screenlength,7)
         pyxel.circ(self.centro[0], self.centro[1], 3, 7)
         
@@ -186,6 +229,11 @@ class Juego:
         pyxel.text(10,30, f"Elevation: {self.elevation:.1f}",7)
         pyxel.text(10,40, f"Charge: {self.charge}",7)
         pyxel.text(10,50, f"Time: {int(self.tempo)}s",7)
+        for tiro in self.tiros:
+            pyxel.text(10, 60, f"height:{tiro.height:.2f}",7)
+        for soldado in self.soldados:
+            if soldado.bordercheck(self.screenlength):
+                pyxel.rect(0,0,self.screenwidth,self.screenlength,8)
         pass
     
 Juego()
