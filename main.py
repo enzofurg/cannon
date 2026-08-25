@@ -1,7 +1,7 @@
 import pyxel
 import math
 import random
-#ARGH!!!
+# :-)
 
 class Target:
     def __init__(self):
