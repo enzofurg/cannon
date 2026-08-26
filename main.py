@@ -40,7 +40,7 @@ class Soldier:
         else:
             return False
     def draw(self):
-        pyxel.rect(self.x,self.y,2,2,6)
+        pyxel.rect(self.x,self.y,5,10,6)
     def move(self):
         self.y+=1/12
 
@@ -84,9 +84,18 @@ class Shoot:
 
         pyxel.circ(self.cordstx,self.cordsty, 2+abs(self.height/30), 10)
         if time > self.traveltime:
+
             pyxel.circ(self.cords[0],self.cords[1], 8, 8)
             pyxel.circ(self.cords[0],self.cords[1], 7, 10)
             pyxel.circ(self.cords[0],self.cords[1], 5, 7)
+
+class Crater:
+    def __init__(self, cords):
+        self.cords = cords
+    def draw(self):
+        pyxel.dither(0.5)
+        pyxel.circ(self.cords[0], self.cords[1], 5, 13)
+        pyxel.dither(1)
 
 class Aim:
     def __init__(self, charge, elevation, angle, centrotuple):
@@ -106,6 +115,7 @@ class Juego:
         self.screenlength = 600
         pyxel.init(self.screenwidth,self.screenlength, title="Cannon",fps=12)
         self.centro=(self.screenwidth/2,self.screenlength-20)
+        self.tshot = 0
         self.cannontip=(0,0)
         #self.vetor=(0,0)
         self.anglerad=0
@@ -114,14 +124,15 @@ class Juego:
         self.elevationrad = 0
         self.charge=1
         self.fire=False
+        self.craters = []
         self.tiros = []
         self.alvos = []
         self.soldados = []
 
-        for i in range(25):
+        for i in range(0):
             self.alvos.append(Target())
 
-        for i in range(0):
+        for i in range(10):
             self.soldados.append(Soldier())
         pyxel.run(self.update, self.draw)
 
@@ -132,9 +143,9 @@ class Juego:
     def update(self):
         self.fire=False
         self.elevationrad = self.elevation * math.pi/180
-        if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) and len(self.tiros)<1:
+        if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) and self.tempo > self.tshot: #len(self.tiros)<1:
             self.tiros.append(Shoot(self.charge,self.elevationrad,self.anglerad,self.centro, self.tempo))
-
+            self.tshot = self.tempo + 2
             self.fire=True
         else:
             self.mira=Aim(self.charge,self.elevationrad,self.anglerad,self.centro)
@@ -148,8 +159,9 @@ class Juego:
                     if alvo.hitcheck(tiro.cords,10):
                         self.alvos.remove(alvo)
                 for soldado in self.soldados:
-                    if soldado.hitcheck(tiro.cords,10):
+                    if soldado.hitcheck(tiro.cords,12):
                         self.soldados.remove(soldado)
+                self.craters.append(Crater(tiro.cords))
                 self.tiros.remove(tiro)
         
         if pyxel.btn(pyxel.KEY_UP):
@@ -197,6 +209,9 @@ class Juego:
         pyxel.line(0,self.screenlength-51,self.screenwidth, self.screenlength-51, 8)
         pyxel.line(0,self.screenlength-52,self.screenwidth, self.screenlength-52, 8)
 
+        for crater in self.craters:
+            crater.draw()
+
         pyxel.dither(1)
         for alvos in self.alvos:
             alvos.spawn()
@@ -225,7 +240,7 @@ class Juego:
         
         #TEXTO
         pyxel.text(10,10,f"Mouse (x,y): {pyxel.mouse_x}, {pyxel.mouse_y}", 7)
-        pyxel.text(10,20, f"Angle {self.angle:.2f}°", 7)
+        pyxel.text(10,20, f"Angle {self.angle:12.2f}°", 7)
         pyxel.text(10,30, f"Elevation: {self.elevation:.1f}",7)
         pyxel.text(10,40, f"Charge: {self.charge}",7)
         pyxel.text(10,50, f"Time: {int(self.tempo)}s",7)
