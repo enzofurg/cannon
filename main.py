@@ -110,12 +110,14 @@ class Aim:
 
 class Juego:
     def __init__(self):
-        self.tempo = 0
+        self.tempo = 1
         self.screenwidth = 500
         self.screenlength = 600
         pyxel.init(self.screenwidth,self.screenlength, title="Cannon",fps=12)
         self.centro=(self.screenwidth/2,self.screenlength-20)
-        self.tshot = 0
+        self.trueaim = (pyxel.mouse_x, pyxel.mouse_y)
+        self.delayaim = self.trueaim
+        self.tshot = 1
         self.cannontip=(0,0)
         #self.vetor=(0,0)
         self.anglerad=0
@@ -129,10 +131,10 @@ class Juego:
         self.alvos = []
         self.soldados = []
 
-        for i in range(0):
+        for i in range(10):
             self.alvos.append(Target())
 
-        for i in range(10):
+        for i in range(0):
             self.soldados.append(Soldier())
         pyxel.run(self.update, self.draw)
 
@@ -249,6 +251,9 @@ class Juego:
         for soldado in self.soldados:
             if soldado.bordercheck(self.screenlength):
                 pyxel.rect(0,0,self.screenwidth,self.screenlength,8)
+        if self.tshot>self.tempo:
+            pyxel.rect(self.cannontip[0], self.cannontip[1]-20, 40*((self.tshot-self.tempo)/2),5,10)
+
         pass
     
 Juego()
