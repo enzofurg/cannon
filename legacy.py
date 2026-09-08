@@ -23,7 +23,7 @@ class Target:
         else:
             return False
 
-class Soldier:
+class Tank:
     def __init__(self):
         self.x = random.randint(10,480)
         self.y = random.randint(40,70)
@@ -142,13 +142,13 @@ class Juego:
         self.craters = []
         self.tiros = []
         self.alvos = []
-        self.soldados = []
-
-        for i in range(10):
-            self.alvos.append(Target())
+        self.tanques = []
 
         for i in range(0):
-            self.soldados.append(Soldier())
+            self.alvos.append(Target())
+
+        for i in range(10):
+            self.tanques.append(Tank())
         pyxel.run(self.update, self.draw)
 
 
@@ -184,17 +184,17 @@ class Juego:
         else:
             self.mira=Aim(self.charge,self.elevationrad,self.anglerad,self.centro)
 
-        for soldado in self.soldados:
-            soldado.move()
+        for tanque in self.tanques:
+            tanque.move()
             
         for tiro in self.tiros:
             if tiro.traveltime < self.tempo:
                 for alvo in self.alvos:
                     if alvo.hitcheck(tiro.cords,10):
                         self.alvos.remove(alvo)
-                for soldado in self.soldados:
-                    if soldado.hitcheck(tiro.cords,12):
-                        self.soldados.remove(soldado)
+                for tanque in self.tanques:
+                    if tanque.hitcheck(tiro.cords,12):
+                        self.tanques.remove(tanque)
                 self.craters.append(Crater(tiro.cords))
                 self.tiros.remove(tiro)
         
@@ -251,8 +251,8 @@ class Juego:
         for alvos in self.alvos:
             alvos.spawn()
 
-        for soldado in self.soldados:
-            soldado.draw()
+        for tanque in self.tanques:
+            tanque.draw()
 
         if self.fire:
             pyxel.circ(self.cannontip[0],self.cannontip[1],2,10)
@@ -284,8 +284,8 @@ class Juego:
         pyxel.text(10,60, f"{self.trueaim} {self.delayaim}", 7)
         for tiro in self.tiros:
             pyxel.text(10, 60, f"height:{tiro.height:.2f}",7)
-        for soldado in self.soldados:
-            if soldado.bordercheck(self.screenlength):
+        for tanque in self.tanques:
+            if tanque.bordercheck(self.screenlength):
                 pyxel.rect(0,0,self.screenwidth,self.screenlength,8)
         if self.tshot>self.tempo:
             pyxel.rect(self.cannontip[0], self.cannontip[1]-20, 40*((self.tshot-self.tempo)/2),5,10)
