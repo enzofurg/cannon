@@ -104,7 +104,7 @@ class Aim:
         #print(self.distance)
         self.cords=(centrotuple[0]+self.distance*math.cos(angle), centrotuple[1]-self.distance*math.sin(angle))
         #print(self.cords)
-    def animate(self, trueanglerad):
+    def draw(self, trueanglerad):
         pyxel.line(self.centrotuple[0],self.centrotuple[1],self.cords[0],self.cords[1], 13)
         pyxel.circb(self.centrotuple[0]+self.distance*math.cos(trueanglerad),self.centrotuple[1]-self.distance*math.sin(trueanglerad), 3, 13)
 
@@ -222,17 +222,12 @@ class Juego:
         for tiro in self.tiros:
             tiro.move(self.tempo)
         
-        #pyxel.mouse(True)
-        #self.vetor=((pyxel.mouse_x - 60),(pyxel.mouse_y -60))
+
         self.anglerad = abs(math.atan2(((self.centro[1]-self.delayaim[1])),(self.delayaim[0]-self.centro[0])))
         self.trueanglerad = abs(math.atan2(((self.centro[1]-self.trueaim[1])),(self.trueaim[0]-self.centro[0])))
         self.angle = self.anglerad * 180/math.pi
         self.cannontip=((self.centro[0]+(math.cos(self.anglerad)*15*math.cos(self.elevationrad))),(self.centro[1]-(math.sin(self.anglerad)*15*math.cos(self.elevationrad))))
-        #print(self.vetor)
-        #self, charge, elevation, angle, centrox, centroy
-        #print(pyxel.mouse_wheel)
         self.tempo+=1/12
-        #print(f"Tempo: {self.tempo}")
         pass
     
     def draw(self):
@@ -249,7 +244,7 @@ class Juego:
 
         pyxel.dither(1)
         for alvos in self.alvos:
-            alvos.spawn()
+            alvos.draw()
 
         for tanque in self.tanques:
             tanque.draw()
@@ -258,10 +253,10 @@ class Juego:
             pyxel.circ(self.cannontip[0],self.cannontip[1],2,10)
             
         else:
-            self.mira.animate(self.trueanglerad)
+            self.mira.draw(self.trueanglerad)
             
         for tiro in self.tiros:
-            tiro.animate(self.tempo)
+            tiro.draw(self.tempo)
 
 
         pyxel.rect(0,self.centro[1],self.screenwidth,self.screenlength,7)

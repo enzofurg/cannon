@@ -1,4 +1,6 @@
 import pyxel
+import math
+import random
 import game
 
 class MainMenu:
@@ -6,7 +8,7 @@ class MainMenu:
         self.game = game
 
     def update(self):
-        if pyxel.btn(pyxel.KEY_RETURN)
+        if pyxel.btn(pyxel.KEY_RETURN):
             self.game.new_game()
 
     def draw(self):
