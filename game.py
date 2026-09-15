@@ -1,4 +1,4 @@
-import pyxel
+#import pyxel
 import math
 import random
 
@@ -6,29 +6,28 @@ from main_menu import MainMenu
 from level import Level
 
 class Game:
-    STATE_MENU = 0
-    STATE_LEVEL = 0
-    
-    
 
     def __init__(self):
-        self.state = STATE_MENU
+        self.state = "menu"
+        self.levelnum = 0
         self.main_menu = MainMenu(self)
-        self.level = Level(STATE_LEVEL)
+        self.level = Level(self.levelnum)
 
     def new_game(self):
-        self.state = STATE_LEVEL
+        self.state = "level"
+        self.levelnum = 0
 
     def game_over(self):
-        self.state = STATE_MENU
+        self.state = "menu"
+        self.levelnum = 0
     def update(self):
-        if self.state == STATE_MENU:
+        if self.state == "menu":
             self.main_menu.update()
-        elif self.state == STATE_LEVEL:
+        elif self.state == "level":
             self.level.update()
 
     def draw(self):
-        if self.state == STATE_MENU:
+        if self.state == "menu":
             self.main_menu.draw()
-        elif self.state == STATE_LEVEL:
+        elif self.state == "level":
             self.level.draw()

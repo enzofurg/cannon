@@ -6,7 +6,7 @@ class Target:
     def __init__(self):
         self.x= random.randint(10,480)
         self.y= random.randint(60,400)
-    def spawn(self):
+    def draw(self):
         pyxel.circ(self.x, self.y, 4, 8)
         pyxel.circ(self.x, self.y, 3, 7)
         pyxel.circ(self.x, self.y, 2, 8)

@@ -9,7 +9,11 @@ from target import Target
 
 class Level:
     def __init__(self, levelnumber):
-
+        
+        self.screenwidth = 500
+        self.screenlength = 600
+        self.centro = (self.screenwidth/2,self.screenlength-20)
+        self.tempo = 1
         self.trueaim = (pyxel.mouse_x, pyxel.mouse_y)
         self.delayaim = self.trueaim
         self.tshot = 1
@@ -20,6 +24,7 @@ class Level:
         self.elevationrad = 0
         self.charge=1
         self.fire=False
+        self.mira = Aim(self.charge,self.elevationrad,self.anglerad,self.centro)
         self.craters = []
         self.tiros = []
         self.alvos = []
@@ -54,8 +59,8 @@ class Level:
 
         for tanque in self.tanques:
             tanque.update()
-        for alvo in self.alvos:
-            alvo.update()
+        #for alvo in self.alvos:
+            #alvo.update()
         for crater in self.crateres:
             crater.update()
 
@@ -66,18 +71,76 @@ class Level:
             self.tshot = self.tempo + 2
             self.fire=True
         else:
-            self.aim=Aim(self.charge,self.elevationrad,self.anglerad,self.centro)
+            self.mira=Aim(self.charge,self.elevationrad,self.anglerad,self.centro)
+        self.tempo += 1/12
 
 
 
     def draw(self):
+        
         pyxel.cls(0)
-        if self.levelnumber == 0:
-            pyxel.text(10,10, "TESTE", 7)
+        pyxel.dither(0.1)
+        pyxel.rect(0,0,self.screenwidth, self.screenlength, 1)
+        pyxel.dither(0.5)
+        pyxel.line(0,self.screenlength-50,self.screenwidth, self.screenlength-50, 8)
+        pyxel.line(0,self.screenlength-51,self.screenwidth, self.screenlength-51, 8)
+        pyxel.line(0,self.screenlength-52,self.screenwidth, self.screenlength-52, 8)
+
+        for crater in self.craters:
+            crater.draw()
+
+        pyxel.dither(1)
+        for alvos in self.alvos:
+            alvos.draw()
+
         for tanque in self.tanques:
             tanque.draw()
-        for alvo in self.alvos:
-            alvo.draw()
-        for crater in self.crateres:
-            crater.draw()
+
+        if self.fire:
+            pyxel.circ(self.cannontip[0],self.cannontip[1],2,10)
+            
+        else:
+            #self.mira.draw(self.trueanglerad)
+            self.mira.draw(self.trueanglerad)
+            
+        for tiro in self.tiros:
+            tiro.draw(self.tempo)
+
+
+        pyxel.rect(0,self.centro[1],self.screenwidth,self.screenlength,7)
+        pyxel.circ(self.centro[0], self.centro[1], 3, 7)
+        
+        #pyxel.line(self.centro[0], self.centro[1], pyxel.mouse_x, pyxel.mouse_y,7)
+        #DESENHO DO CANO
+        pyxel.line(self.centro[0], self.centro[1], self.cannontip[0], self.cannontip[1], 7)
+        pyxel.line(self.centro[0]-1,self.centro[1],self.cannontip[0], self.cannontip[1], 7)
+        pyxel.line(self.centro[0]+1,self.centro[1],self.cannontip[0], self.cannontip[1], 7)
+
+        #pyxel.circb(self.trueaim[0],self.trueaim[1], 3, 13)
+        
+        #TEXTO
+        pyxel.text(10,10,f"Mouse (x,y): {pyxel.mouse_x}, {pyxel.mouse_y}", 7)
+        pyxel.text(10,20, f"Angle {self.angle:12.2f}°", 7)
+        pyxel.text(10,30, f"Elevation: {self.elevation:.1f}",7)
+        pyxel.text(10,40, f"Charge: {self.charge}",7)
+        pyxel.text(10,50, f"Time: {int(self.tempo)}s",7)
+        pyxel.text(10,60, f"{self.trueaim} {self.delayaim}", 7)
+        for tiro in self.tiros:
+            pyxel.text(10, 60, f"height:{tiro.height:.2f}",7)
+        for tanque in self.tanques:
+            if tanque.bordercheck(self.screenlength):
+                pyxel.rect(0,0,self.screenwidth,self.screenlength,8)
+        if self.tshot>self.tempo:
+            pyxel.rect(self.cannontip[0], self.cannontip[1]-20, 40*((self.tshot-self.tempo)/2),5,10)
+        pyxel.mouse(True)
+#PRÉ PASTE
+        #pyxel.cls(0)
+        #if self.levelnumber == 0:
+        #    pyxel.text(10,10, "TESTE", 7)
+        #for tanque in self.tanques:
+        #    tanque.draw()
+        #for alvo in self.alvos:
+        #    alvo.draw()
+        #for crater in self.crateres:
+        #    crater.draw()
         
