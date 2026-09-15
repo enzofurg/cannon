@@ -19,6 +19,7 @@ class Level:
         self.tshot = 1
         self.cannontip=(0,0)
         self.anglerad=0
+        self.trueanglerad = 0
         self.angle = 0
         self.elevation = 30
         self.elevationrad = 0
@@ -66,12 +67,16 @@ class Level:
 
         self.fire=False
         self.elevationrad = self.elevation * math.pi/180
+        self.trueanglerad = abs(math.atan2(((self.centro[1]-self.trueaim[1])),(self.trueaim[0]-self.centro[0])))
         if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) and self.tempo > self.tshot: 
             self.tiros.append(Shoot(self.charge,self.elevationrad,self.anglerad,self.centro, self.tempo))
             self.tshot = self.tempo + 2
             self.fire=True
         else:
             self.mira=Aim(self.charge,self.elevationrad,self.anglerad,self.centro)
+
+        self.angle = self.anglerad * 180/math.pi
+        self.cannontip=((self.centro[0]+(math.cos(self.anglerad)*15*math.cos(self.elevationrad))),(self.centro[1]-(math.sin(self.anglerad)*15*math.cos(self.elevationrad))))
         self.tempo += 1/12
 
 

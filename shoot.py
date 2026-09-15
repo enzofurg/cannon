@@ -36,7 +36,7 @@ class Shoot:
             self.cordstx = self.cords[0]
             self.cordsty = self.cords[1]
 
-    def animate(self, time):
+    def draw(self, time):
         
 
         #print(self.cordstx, self.cordsty)
