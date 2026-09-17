@@ -7,6 +7,7 @@ from shoot import Shoot
 from tank import Tank
 from target import Target
 from charge import Charge
+from elevation import Elevation
 from crater import Crater
 
 
@@ -24,11 +25,10 @@ class Level:
         self.anglerad=0
         self.trueanglerad = 0
         self.angle = 0
-        self.elevation = 30
-        self.elevationrad = 0
+        self.elevation = Elevation()
         self.charges=Charge()
         self.fire=False
-        self.mira = Aim(self.charges.chargenum,self.elevationrad,self.anglerad,self.centro)
+        self.mira = Aim(self.charges.chargenum,self.elevation.elevrad,self.anglerad,self.centro)
         self.craters = []
         self.tiros = []
         self.alvos = []
@@ -81,18 +81,19 @@ class Level:
             crater.update()
 
         self.fire=False
-        self.elevationrad = self.elevation * math.pi/180
+        #self.elevationrad = self.elevation * math.pi/180
         self.anglerad = abs(math.atan2(((self.centro[1]-self.delayaim[1])),(self.delayaim[0]-self.centro[0])))
         self.trueanglerad = abs(math.atan2(((self.centro[1]-self.trueaim[1])),(self.trueaim[0]-self.centro[0])))
         if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) and self.tempo > self.tshot: 
-            self.tiros.append(Shoot(self.charges.chargenum,self.elevationrad,self.anglerad,self.centro, self.tempo))
+            self.tiros.append(Shoot(self.charges.chargenum,self.elevation.elevrad,self.anglerad,self.centro, self.tempo))
             self.tshot = self.tempo + 2
             self.fire=True
         else:
-            self.mira=Aim(self.charges.chargenum,self.elevationrad,self.anglerad,self.centro)
+            self.mira=Aim(self.charges.chargenum,self.elevation.elevrad,self.anglerad,self.centro)
         self.charges.incdec(pyxel.btn(pyxel.KEY_LEFT),pyxel.btn(pyxel.KEY_RIGHT))
+        self.elevation.incdec(pyxel.btn(pyxel.KEY_UP),pyxel.btn(pyxel.KEY_DOWN))
         self.angle = self.anglerad * 180/math.pi
-        self.cannontip=((self.centro[0]+(math.cos(self.anglerad)*15*math.cos(self.elevationrad))),(self.centro[1]-(math.sin(self.anglerad)*15*math.cos(self.elevationrad))))
+        self.cannontip=((self.centro[0]+(math.cos(self.anglerad)*15*math.cos(self.elevation.elevrad))),(self.centro[1]-(math.sin(self.anglerad)*15*math.cos(self.elevation.elevrad))))
         self.tempo += 1/12
 
 
@@ -142,7 +143,7 @@ class Level:
         #TEXTO
         pyxel.text(10,10,f"Mouse (x,y): {pyxel.mouse_x}, {pyxel.mouse_y}", 7)
         pyxel.text(10,20, f"Angle {self.angle:12.2f}°", 7)
-        pyxel.text(10,30, f"Elevation: {self.elevation:.1f}",7)
+        pyxel.text(10,30, f"Elevation: {self.elevation.elevangle:.1f}",7)
         pyxel.text(10,40, f"Charge: {self.charges.chargenum}",7)
         pyxel.text(10,50, f"Time: {int(self.tempo)}s",7)
         pyxel.text(10,60, f"{self.trueaim} {self.delayaim}", 7)
