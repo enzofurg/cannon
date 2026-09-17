@@ -6,6 +6,9 @@ from aim import Aim
 from shoot import Shoot
 from tank import Tank
 from target import Target
+from charge import Charge
+from crater import Crater
+
 
 class Level:
     def __init__(self, levelnumber):
@@ -23,9 +26,9 @@ class Level:
         self.angle = 0
         self.elevation = 30
         self.elevationrad = 0
-        self.charge=1
+        self.charges=Charge()
         self.fire=False
-        self.mira = Aim(self.charge,self.elevationrad,self.anglerad,self.centro)
+        self.mira = Aim(self.charges.chargenum,self.elevationrad,self.anglerad,self.centro)
         self.craters = []
         self.tiros = []
         self.alvos = []
@@ -57,6 +60,18 @@ class Level:
             elif self.trueaim[1] - self.delayaim[1] < -0.5:
                 self.delayaim = (self.delayaim[0], self.delayaim[1]-0.5)
 
+        for tiro in self.tiros:
+            if tiro.traveltime < self.tempo:
+                for alvo in self.alvos:
+                    if alvo.hitcheck(tiro.cords,10):
+                        self.alvos.remove(alvo)
+                for tanque in self.tanques:
+                    if tanque.hitcheck(tiro.cords,12):
+                        self.tanques.remove(tanque)
+                self.craters.append(Crater(tiro.cords))
+                self.tiros.remove(tiro)
+            tiro.move(self.tempo)
+
 
         for tanque in self.tanques:
             tanque.update()
@@ -67,14 +82,15 @@ class Level:
 
         self.fire=False
         self.elevationrad = self.elevation * math.pi/180
+        self.anglerad = abs(math.atan2(((self.centro[1]-self.delayaim[1])),(self.delayaim[0]-self.centro[0])))
         self.trueanglerad = abs(math.atan2(((self.centro[1]-self.trueaim[1])),(self.trueaim[0]-self.centro[0])))
         if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) and self.tempo > self.tshot: 
-            self.tiros.append(Shoot(self.charge,self.elevationrad,self.anglerad,self.centro, self.tempo))
+            self.tiros.append(Shoot(self.charges.chargenum,self.elevationrad,self.anglerad,self.centro, self.tempo))
             self.tshot = self.tempo + 2
             self.fire=True
         else:
-            self.mira=Aim(self.charge,self.elevationrad,self.anglerad,self.centro)
-
+            self.mira=Aim(self.charges.chargenum,self.elevationrad,self.anglerad,self.centro)
+        self.charges.incdec(pyxel.btn(pyxel.KEY_LEFT),pyxel.btn(pyxel.KEY_RIGHT))
         self.angle = self.anglerad * 180/math.pi
         self.cannontip=((self.centro[0]+(math.cos(self.anglerad)*15*math.cos(self.elevationrad))),(self.centro[1]-(math.sin(self.anglerad)*15*math.cos(self.elevationrad))))
         self.tempo += 1/12
@@ -127,11 +143,11 @@ class Level:
         pyxel.text(10,10,f"Mouse (x,y): {pyxel.mouse_x}, {pyxel.mouse_y}", 7)
         pyxel.text(10,20, f"Angle {self.angle:12.2f}°", 7)
         pyxel.text(10,30, f"Elevation: {self.elevation:.1f}",7)
-        pyxel.text(10,40, f"Charge: {self.charge}",7)
+        pyxel.text(10,40, f"Charge: {self.charges.chargenum}",7)
         pyxel.text(10,50, f"Time: {int(self.tempo)}s",7)
         pyxel.text(10,60, f"{self.trueaim} {self.delayaim}", 7)
         for tiro in self.tiros:
-            pyxel.text(10, 60, f"height:{tiro.height:.2f}",7)
+            pyxel.text(10, 70, f"height:{tiro.height:.2f}",7)
         for tanque in self.tanques:
             if tanque.bordercheck(self.screenlength):
                 pyxel.rect(0,0,self.screenwidth,self.screenlength,8)
