@@ -9,13 +9,13 @@ class Game:
 
     def __init__(self):
         self.state = "menu"
-        self.levelnum = 0
+        self.levelnum = 1
         self.main_menu = MainMenu(self)
         self.level = Level(self.levelnum)
 
     def new_game(self):
         self.state = "level"
-        self.levelnum = 0
+        self.levelnum = 1
 
     def game_over(self):
         self.state = "menu"

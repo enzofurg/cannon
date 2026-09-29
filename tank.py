@@ -19,6 +19,13 @@ class Tank:
         else:
             return False
     def draw(self):
-        pyxel.rect(self.x,self.y,5,10,6)
-    def move(self):
+        pyxel.rect(self.x-3,self.y-5,7,11,11)
+        pyxel.dither(0.5)
+        #pyxel.rect(self.x-3,self.y-5,7,11,0)
+        pyxel.dither(1)
+        pyxel.circ(self.x,self.y,2,3)
+        pyxel.line(self.x,self.y,self.x,self.y+12,11)
+        pyxel.circ(self.x,self.y+12,1,11)
+        
+    def update(self):
         self.y+=1/12

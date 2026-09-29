@@ -38,11 +38,16 @@ class Level:
         self.tanques=[]
         self.alvos=[]
         self.crateres=[]
-        
+        self.cargasinv = 0
+        self.tirosinv = 0
         if self.levelnumber == 0:
+          self.cargasinv = 60
+          self.tirosinv = 20
           for i in range(10):
                 self.alvos.append(Target())
         elif self.levelnumber == 1:
+            self.cargasinv = 60
+            self.tirosinv = 20
             for i in range(10):
                 self.tanques.append(Tank())
 
@@ -84,13 +89,19 @@ class Level:
         #self.elevationrad = self.elevation * math.pi/180
         self.anglerad = abs(math.atan2(((self.centro[1]-self.delayaim[1])),(self.delayaim[0]-self.centro[0])))
         self.trueanglerad = abs(math.atan2(((self.centro[1]-self.trueaim[1])),(self.trueaim[0]-self.centro[0])))
-        if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) and self.tempo > self.tshot: 
+
+        #IF DO TIRO
+        if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) and self.tempo > self.tshot and self.cargasinv>self.charges.chargenum and self.tirosinv>0: 
             self.tiros.append(Shoot(self.charges.chargenum,self.elevation.elevrad,self.anglerad,self.centro, self.tempo))
             self.tshot = self.tempo + 2
+            self.cargasinv -= self.charges.chargenum
+            self.tirosinv -= 1
             self.fire=True
+        elif pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            print("lol")
         else:
             self.mira=Aim(self.charges.chargenum,self.elevation.elevrad,self.anglerad,self.centro)
-        self.charges.incdec(pyxel.btn(pyxel.KEY_LEFT),pyxel.btn(pyxel.KEY_RIGHT))
+        self.charges.incdec(pyxel.btnp(pyxel.KEY_LEFT),pyxel.btn(pyxel.KEY_RIGHT))
         self.elevation.incdec(pyxel.btn(pyxel.KEY_UP),pyxel.btn(pyxel.KEY_DOWN))
         self.angle = self.anglerad * 180/math.pi
         self.cannontip=((self.centro[0]+(math.cos(self.anglerad)*15*math.cos(self.elevation.elevrad))),(self.centro[1]-(math.sin(self.anglerad)*15*math.cos(self.elevation.elevrad))))
@@ -147,6 +158,9 @@ class Level:
         pyxel.text(10,40, f"Charge: {self.charges.chargenum}",7)
         pyxel.text(10,50, f"Time: {int(self.tempo)}s",7)
         pyxel.text(10,60, f"{self.trueaim} {self.delayaim}", 7)
+        pyxel.text(10,70, f"CARGAS: {self.cargasinv}", 7)
+
+    
         for tiro in self.tiros:
             pyxel.text(10, 70, f"height:{tiro.height:.2f}",7)
         for tanque in self.tanques:

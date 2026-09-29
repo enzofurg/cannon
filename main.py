@@ -3,7 +3,7 @@ import math
 import random
 from game import Game
 
-print("Hello World")
+
 class App:
     def __init__(self):
         
