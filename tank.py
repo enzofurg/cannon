@@ -28,4 +28,4 @@ class Tank:
         pyxel.circ(self.x,self.y+12,1,11)
         
     def update(self):
-        self.y+=1/12
+        self.y+=1/12 * 2
