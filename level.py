@@ -7,6 +7,7 @@ from shoot import Shoot
 from tank import Tank
 from target import Target
 from charge import Charge
+from plane import Plane
 from elevation import Elevation
 from crater import Crater
 
@@ -33,10 +34,11 @@ class Level:
         self.tiros = []
         self.alvos = []
         self.tanques = []
-        
+        self.planes = []
         self.levelnumber=levelnumber
         self.tanques=[]
         self.alvos=[]
+        self.planes
         self.crateres=[]
         self.cargasinv = 0
         self.tirosinv = 0
@@ -50,6 +52,10 @@ class Level:
             self.tirosinv = 20
             for i in range(10):
                 self.tanques.append(Tank())
+        for i in range(20):
+            self.planes.append(Plane())
+
+
 
     def update(self):
         self.trueaim = (pyxel.mouse_x, pyxel.mouse_y)
@@ -128,6 +134,9 @@ class Level:
 
         for tanque in self.tanques:
             tanque.draw()
+
+        for plane in self.planes:
+            plane.draw()
 
         if self.fire:
             pyxel.circ(self.cannontip[0],self.cannontip[1],2,10)
