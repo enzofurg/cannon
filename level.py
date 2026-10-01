@@ -52,7 +52,7 @@ class Level:
             self.tirosinv = 20
             for i in range(10):
                 self.tanques.append(Tank())
-        for i in range(3):
+        for i in range(30):
             self.planes.append(Plane())
 
 
