@@ -3,9 +3,10 @@ import math
 import random
 
 class Plane:
-    def __init__(self):
+    def __init__(self,range, tempo):
         self.fpoint = (random.randint(-40,-30),random.randint(0,420))
         self.spoint = (random.randint(530,540),random.randint(0,420))
+        self.spawntime = tempo + random.randint(range[0],range[1])
         if self.fpoint[1] < self.spoint[1]:
             self.anglerad = math.atan2(self.spoint[1]-self.fpoint[1],self.spoint[0]-self.fpoint[0])
             self.planetip = (self.fpoint[0]+math.cos(self.anglerad)*20,self.fpoint[1]+math.sin(self.anglerad)*20)
@@ -19,11 +20,16 @@ class Plane:
         self.fixedpoint = (100,100)
 
 
-    def update(self):
-        self.increment = (math.cos(self.anglerad)*(6),math.sin(self.anglerad)*(6))
-        self.planetip = (self.planetip[0]+self.increment[0],self.planetip[1]+self.increment[1])
-        self.wing1 = (self.wing1[0]+self.increment[0],self.wing1[1]+self.increment[1])
-        self.wing2 = (self.wing2[0]+self.increment[0],self.wing2[1]+self.increment[1])
+    def update(self,tempo):
+        if tempo > self.spawntime:
+            self.increment = (math.cos(self.anglerad)*(6),math.sin(self.anglerad)*(6))
+            self.planetip = (self.planetip[0]+self.increment[0],self.planetip[1]+self.increment[1])
+            self.wing1 = (self.wing1[0]+self.increment[0],self.wing1[1]+self.increment[1])
+            self.wing2 = (self.wing2[0]+self.increment[0],self.wing2[1]+self.increment[1])
+        if tempo > (self.spawntime + 12):
+            return True
+        else:
+            return False
 
    
     def draw(self):

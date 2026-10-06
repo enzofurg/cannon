@@ -52,8 +52,8 @@ class Level:
             self.tirosinv = 20
             for i in range(10):
                 self.tanques.append(Tank())
-        for i in range(30):
-            self.planes.append(Plane())
+        for i in range(10):
+            self.planes.append(Plane((0,20),self.tempo))
 
 
 
@@ -89,7 +89,8 @@ class Level:
         #for alvo in self.alvos:
             #alvo.update()
         for plane in self.planes:
-            plane.update()
+            if (plane.update(self.tempo)):
+                self.planes.remove(plane)
         for crater in self.crateres:
             crater.update()
 
