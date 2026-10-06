@@ -40,7 +40,7 @@ class Level:
         self.tanques=[]
         self.alvos=[]
         self.planes=[]
-        self.soldier = self.soldier
+        self.planeinfo = (False,(0,0))
         self.soldiers=[]
         self.crateres=[]
         self.cargasinv = 0
@@ -58,7 +58,7 @@ class Level:
         for i in range(10):
             self.planes.append(Plane((0,20),self.tempo))
 
-        for i in range(20):
+        for i in range(0):
             self.soldiers.append(Soldier(random.randint(20,480),0))
 
     def fim(self):
@@ -107,6 +107,10 @@ class Level:
         for plane in self.planes:
             if (plane.update(self.tempo)):
                 self.planes.remove(plane)
+            
+            self.planeinfo = plane.spawncheck(self.tempo)
+            if self.planeinfo[0]:
+                self.soldiers.append(Soldier(self.planeinfo[1],self.planeinfo[2]))
         for crater in self.crateres:
             crater.update()
 
