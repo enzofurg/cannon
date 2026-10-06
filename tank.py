@@ -6,11 +6,16 @@ class Tank:
     def __init__(self):
         self.x = random.randint(10,480)
         self.y = random.randint(40,70)
+        self.hp = 2
     def hitcheck(self, hitcords, radius):
         self.hitdistance = math.sqrt((self.x-hitcords[0])**2 + (self.y-hitcords[1])**2)
         if self.hitdistance <= radius:
-            print("Acerto")
-            return True
+            self.hp -= 1
+            if self.hp < 1:
+            #print("Acerto")
+                return True
+            else:
+                return False
         else:
             return False
     def bordercheck(self, screenlength):
@@ -26,6 +31,9 @@ class Tank:
         pyxel.circ(self.x,self.y,2,3)
         pyxel.line(self.x,self.y,self.x,self.y+12,11)
         pyxel.circ(self.x,self.y+12,1,11)
+        pyxel.dither(abs((2-self.hp)/2))
+        pyxel.rect(self.x-3,self.y-5,7,11,0)
+        pyxel.dither(1)
         
     def update(self):
-        self.y+=1/12 * 2
+        self.y+=1/12 * self.hp

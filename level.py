@@ -1,5 +1,5 @@
 import math
-
+import game
 import pyxel
 import random
 from aim import Aim
@@ -13,8 +13,8 @@ from crater import Crater
 
 
 class Level:
-    def __init__(self, levelnumber):
-        
+    def __init__(self, levelnumber, game):
+        self.game = game
         self.screenwidth = 500
         self.screenlength = 600
         self.centro = (self.screenwidth/2,self.screenlength-20)
@@ -55,10 +55,14 @@ class Level:
         for i in range(10):
             self.planes.append(Plane((0,20),self.tempo))
 
-
+    def fim(self):
+        self.game.game_over()
 
     def update(self):
         self.trueaim = (pyxel.mouse_x, pyxel.mouse_y)
+
+        if (pyxel.btn(pyxel.MOUSE_BUTTON_RIGHT)):
+            self.fim()
 
         for x  in range(20):
             if self.trueaim[0] - self.delayaim[0] > 0.5:
@@ -86,6 +90,9 @@ class Level:
 
         for tanque in self.tanques:
             tanque.update()
+            if tanque.bordercheck(self.screenlength):
+                self.fim()
+                
         #for alvo in self.alvos:
             #alvo.update()
         for plane in self.planes:
@@ -175,9 +182,7 @@ class Level:
     
         for tiro in self.tiros:
             pyxel.text(10, 70, f"height:{tiro.height:.2f}",7)
-        for tanque in self.tanques:
-            if tanque.bordercheck(self.screenlength):
-                pyxel.rect(0,0,self.screenwidth,self.screenlength,8)
+            
         if self.tshot>self.tempo:
             pyxel.rect(self.cannontip[0], self.cannontip[1]-20, 40*((self.tshot-self.tempo)/2),5,10)
         pyxel.mouse(True)
