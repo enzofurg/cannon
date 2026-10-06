@@ -8,6 +8,7 @@ from tank import Tank
 from target import Target
 from charge import Charge
 from plane import Plane
+from soldier import Soldier
 from elevation import Elevation
 from crater import Crater
 
@@ -38,7 +39,9 @@ class Level:
         self.levelnumber=levelnumber
         self.tanques=[]
         self.alvos=[]
-        self.planes
+        self.planes=[]
+        self.soldier = self.soldier
+        self.soldiers=[]
         self.crateres=[]
         self.cargasinv = 0
         self.tirosinv = 0
@@ -54,6 +57,9 @@ class Level:
                 self.tanques.append(Tank())
         for i in range(10):
             self.planes.append(Plane((0,20),self.tempo))
+
+        for i in range(20):
+            self.soldiers.append(Soldier(random.randint(20,480),0))
 
     def fim(self):
         self.game.game_over()
@@ -86,6 +92,9 @@ class Level:
                 self.craters.append(Crater(tiro.cords))
                 self.tiros.remove(tiro)
             tiro.move(self.tempo)
+
+        for soldier in self.soldiers:
+            soldier.update()
 
 
         for tanque in self.tanques:
@@ -148,6 +157,9 @@ class Level:
         for plane in self.planes:
             plane.draw()
 
+        for soldier in self.soldiers:
+            soldier.draw()
+
         if self.fire:
             pyxel.circ(self.cannontip[0],self.cannontip[1],2,10)
             
@@ -182,7 +194,7 @@ class Level:
     
         for tiro in self.tiros:
             pyxel.text(10, 70, f"height:{tiro.height:.2f}",7)
-            
+
         if self.tshot>self.tempo:
             pyxel.rect(self.cannontip[0], self.cannontip[1]-20, 40*((self.tshot-self.tempo)/2),5,10)
         pyxel.mouse(True)
