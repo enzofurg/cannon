@@ -53,9 +53,9 @@ class Level:
         elif self.levelnumber == 1:
             self.cargasinv = 60
             self.tirosinv = 20
-            for i in range(10):
+            for i in range(0):
                 self.tanques.append(Tank())
-        for i in range(10):
+        for i in range(100):
             self.planes.append(Plane((0,20),self.tempo))
 
         for i in range(0):
@@ -89,12 +89,17 @@ class Level:
                 for tanque in self.tanques:
                     if tanque.hitcheck(tiro.cords,12):
                         self.tanques.remove(tanque)
+                for soldier in self.soldiers:
+                    if soldier.hitcheck(tiro.cords,12):
+                        self.soldiers.remove(soldier)
                 self.craters.append(Crater(tiro.cords))
                 self.tiros.remove(tiro)
             tiro.move(self.tempo)
 
         for soldier in self.soldiers:
             soldier.update()
+            if soldier.bordercheck(self.screenlength):
+                self.fim()
 
 
         for tanque in self.tanques:
@@ -110,7 +115,7 @@ class Level:
             
             self.planeinfo = plane.spawncheck(self.tempo)
             if self.planeinfo[0]:
-                self.soldiers.append(Soldier(self.planeinfo[1],self.planeinfo[2]))
+                self.soldiers.append(Soldier(self.planeinfo[1][0],self.planeinfo[1][1]))
         for crater in self.crateres:
             crater.update()
 
@@ -194,6 +199,7 @@ class Level:
         pyxel.text(10,50, f"Time: {int(self.tempo)}s",7)
         pyxel.text(10,60, f"{self.trueaim} {self.delayaim}", 7)
         pyxel.text(10,70, f"CARGAS: {self.cargasinv}", 7)
+        pyxel.text(10,80,f"SPAWNBOOL:{self.planeinfo[0]}",7)
 
     
         for tiro in self.tiros:

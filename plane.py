@@ -7,6 +7,8 @@ class Plane:
         self.fpoint = (random.randint(-40,-30),random.randint(0,420))
         self.spoint = (random.randint(530,540),random.randint(0,420))
         self.spawntime = tempo + random.randint(range[0],range[1])
+        self.soldiertime = tempo
+        self.soldierbool = True
         if self.fpoint[1] < self.spoint[1]:
             self.wmiddle = (self.fpoint[0],self.fpoint[1])
             self.anglerad = math.atan2(self.spoint[1]-self.fpoint[1],self.spoint[0]-self.fpoint[0])
@@ -30,20 +32,20 @@ class Plane:
             self.wing2 = (self.wing2[0]+self.increment[0],self.wing2[1]+self.increment[1])
             self.wmiddle = (self.wmiddle[0]+self.increment[0], self.wmiddle[1]+self.increment[1])
             self.spawntime = tempo
-            self.spawnbool = False
+            self.soldierbool = False
         if tempo > (self.spawntime + 12):
             return True
         else:
             return False
 
     def spawncheck(self,tempo):
-        if (self.wmiddle[0] > 50 or self.wmiddle[0] < 450):
-            if tempo > self.spawntime:
-                self.spawnbool = True
-                self.spawntime = tempo + 0.5
+        if (self.planetip[0] > 50 and self.planetip[0]<450):#(self.wmiddle[0] > 50 or self.wmiddle[0] < 450):
+            if tempo > self.soldiertime:
+                self.soldierbool = True
+                self.soldiertime = tempo + 0.5
             else:
-                self.spawnbool = False
-        return (self.spawnbool,(self.wmiddle[0],self.wmiddle[1]))
+                self.soldierbool = False
+        return (self.soldierbool,(self.wmiddle[0],self.wmiddle[1]))
 
    
     def draw(self):
@@ -51,12 +53,7 @@ class Plane:
         pyxel.dither(0.7)
         pyxel.line(self.fpoint[0],self.fpoint[1],self.spoint[0],self.spoint[1], 14)
         pyxel.dither(1)
-        #pyxel.tri(self.planetip[0],self.planetip[1],self.wing1[0],self.wing1[0],self.wing2[0],self.wing2[1],8)
-        #pyxel.tri(self.planetip[0],self.planetip[1],self.fixedpoint[0],self.fixedpoint[0],self.wing2[0],self.wing2[1],8) #WING2 OK
         pyxel.tri(self.planetip[0],self.planetip[1],self.wing1[0],self.wing1[1],self.wing2[0],self.wing2[1],8)
-        #pyxel.circb(self.wing1[0],self.wing1[1],20,12)
-        #pyxel.circb(self.wing2[0],self.wing2[1],20,7)
 
 
-    #def update(self):
-        #self.y+=1/12
+
