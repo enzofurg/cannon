@@ -53,13 +53,14 @@ class Level:
         elif self.levelnumber == 1:
             self.cargasinv = 60
             self.tirosinv = 20
-            for i in range(0):
+            for i in range(10):
                 self.tanques.append(Tank())
-        for i in range(100):
+        for i in range(3):
             self.planes.append(Plane((0,20),self.tempo))
 
         for i in range(0):
             self.soldiers.append(Soldier(random.randint(20,480),0))
+        self.inimigos = len(self.alvos) + len(self.tanques) + len(self.planes) + len(self.soldiers)
 
     def fim(self):
         self.game.game_over()
@@ -139,6 +140,9 @@ class Level:
         self.elevation.incdec(pyxel.btn(pyxel.KEY_UP),pyxel.btn(pyxel.KEY_DOWN))
         self.angle = self.anglerad * 180/math.pi
         self.cannontip=((self.centro[0]+(math.cos(self.anglerad)*15*math.cos(self.elevation.elevrad))),(self.centro[1]-(math.sin(self.anglerad)*15*math.cos(self.elevation.elevrad))))
+        self.inimigos = len(self.alvos) + len(self.tanques) + len(self.planes) + len(self.soldiers)
+        if self.inimigos == 0:
+            self.fim()
         self.tempo += 1/12
 
 

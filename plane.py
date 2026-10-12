@@ -42,7 +42,7 @@ class Plane:
         if (self.planetip[0] > 50 and self.planetip[0]<450):#(self.wmiddle[0] > 50 or self.wmiddle[0] < 450):
             if tempo > self.soldiertime:
                 self.soldierbool = True
-                self.soldiertime = tempo + 0.5
+                self.soldiertime = tempo + 2
             else:
                 self.soldierbool = False
         return (self.soldierbool,(self.wmiddle[0],self.wmiddle[1]))
