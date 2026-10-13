@@ -14,9 +14,9 @@ class Game:
         self.levels=[Level(self.levelnum, self)]
         #self.level = Level(self.levelnum, self)
 
-    def new_game(self):
+    def new_game(self, levelnum):
         self.state = "level"
-        self.levelnum = 1
+        self.levelnum = levelnum
         self.levels=[Level(self.levelnum, self)]
 
     def game_over(self):

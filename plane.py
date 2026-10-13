@@ -4,8 +4,8 @@ import random
 
 class Plane:
     def __init__(self,range, tempo):
-        self.fpoint = (random.randint(-40,-30),random.randint(0,420))
-        self.spoint = (random.randint(530,540),random.randint(0,420))
+        self.fpoint = (random.randint(-40,-30),random.randint(0,200))
+        self.spoint = (random.randint(530,540),random.randint(0,200))
         self.spawntime = tempo + random.randint(range[0],range[1])
         self.soldiertime = tempo
         self.soldierbool = True
